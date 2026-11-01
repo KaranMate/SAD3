@@ -1,0 +1,75 @@
+name: SAST Security Testing
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  # JOB 1: BANDIT SECURITY SCANNING
+  bandit-scan:
+
+    name: Bandit SAST Scan
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Bandit
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit
+
+      - name: Scan Vulnerable Application
+        continue-on-error: true
+        run: |
+          bandit -f txt -o vulnerable-report.txt vulnerable_app.py
+
+      - name: Scan Fixed Application
+        continue-on-error: true
+        run: |
+          bandit -f txt -o fixed-report.txt fixed_app.py
+
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: SAST-Security-Reports
+          path: |
+            vulnerable-report.txt
+            fixed-report.txt
+
+
+  # JOB 2: GITHUB CODEQL SECURITY SCANNING
+  codeql-scan:
+
+    name: GitHub CodeQL Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
