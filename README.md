@@ -69,3 +69,20 @@ Bandit and GitHub CodeQL.
 
 Static analysis helps developers detect potential
 vulnerabilities early in the development process.
+
+SAST Security Testing
+│
+├── Bandit SAST Scan
+│
+│   ├── Checkout Repository
+│   ├── Setup Python
+│   ├── Install Bandit
+│   ├── Scan Vulnerable Application
+│   ├── Scan Fixed Application
+│   └── Upload Security Reports
+│
+└── GitHub CodeQL Scan
+    │
+    ├── Checkout Repository
+    ├── Initialize CodeQL
+    └── Perform CodeQL Analysis
